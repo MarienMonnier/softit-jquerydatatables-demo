@@ -1,0 +1,95 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+
+<br/>
+<div class="panel panel-default">
+    <div class="panel-heading">Product Search</div>
+    <div class="panel-body">
+        <div class="well">
+            <div class="row">
+                <div class="col-xs-4">
+                    <label for="minPrice">Minimum Price</label>
+                    <input type="text" name="minPrice" id="minPrice" value="" class="form-control" />
+                </div>
+                <div class="col-xs-4">
+                    <label for="maxPrice">Maximum Price</label>
+                    <input type="text" name="maxPrice" id="maxPrice" value="" class="form-control" />
+                </div>
+                <div class="col-xs-2">
+                    <button id="search" class="btn btn-primary"><span class="glyphicon glyphicon-search"></span></button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <table class="table table-striped table-hover table-bordered table-responsive" id="dt" width="100%">
+        <thead>
+            <tr>
+                <th data-column="ID" data-order="desc">ID</th>
+                <th data-column="Name">Name</th>
+                <th data-column="UnitPrice">UnitPrice</th>
+            </tr>
+        </thead>
+    </table>
+</div>
+
+@section scripts
+{
+    @Scripts.Render("~/bundles/bootstrap-datatable")
+    <script type="text/javascript">
+        $(function() {
+            var table = $('#dt');
+            var dt = table.dataTable({
+                ajax: {
+                    type: 'POST',
+                    url: '@Url.Action("GetData", "Home")',
+                    data: function(d) {
+                        d.MinPrice = $('#minPrice').val();
+                        d.MaxPrice = $('#maxPrice').val();
+                    }
+                },
+                columns: SOFTIT.getDtColumns(table),
+                order: SOFTIT.getDtOrders(table),
+                processing: true,
+                serverSide: true,
+                orderMulti: false
+            });
+
+            $('#search').click(function(e) {
+                e.preventDefault();
+                dt.fnDraw();
+            });
+        });
+
+        var SOFTIT = SOFTIT || {};
+        SOFTIT.getDtColumns = function (table) {
+            var dtColumns = new Array();
+            table.find('thead th').each(function (i, e) {
+                var sequence = $(e).data('order-sequence');
+                sequence = sequence != null ? sequence.split(',') : sequence;
+                dtColumns.push({
+                    data: $(e).data('column'),
+                    orderSequence: sequence,
+                    type: $(e).data('type')
+                });
+            });
+            return dtColumns;
+        };
+
+        SOFTIT.getDtOrders = function (table) {
+            var dtOrders = new Array();
+            table.find('thead th').each(function (i, e) {
+                if ($(e).data('order') && dtOrders.length == 0) {
+                    dtOrders.push([i, $(e).data('order')]);
+                    return dtOrders;
+                }
+            });
+            return dtOrders;
+        };
+    </script>
+}
+
+@section styles
+{
+    @Styles.Render("~/Content/bootstrap-datatable")
+}
