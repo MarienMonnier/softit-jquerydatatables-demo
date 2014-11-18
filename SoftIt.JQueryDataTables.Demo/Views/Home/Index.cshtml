@@ -48,8 +48,12 @@
                         d.MaxPrice = $('#maxPrice').val();
                     }
                 },
-                columns: SOFTIT.getDtColumns(table),
-                order: SOFTIT.getDtOrders(table),
+            columns: [
+                { data: 'ID' },
+                { data: 'Name' },
+                { data: 'UnitPrice' }
+            ],
+            order: [0, 'desc'],
                 processing: true,
                 serverSide: true,
                 orderMulti: false
@@ -60,32 +64,6 @@
                 dt.fnDraw();
             });
         });
-
-        var SOFTIT = SOFTIT || {};
-        SOFTIT.getDtColumns = function (table) {
-            var dtColumns = new Array();
-            table.find('thead th').each(function (i, e) {
-                var sequence = $(e).data('order-sequence');
-                sequence = sequence != null ? sequence.split(',') : sequence;
-                dtColumns.push({
-                    data: $(e).data('column'),
-                    orderSequence: sequence,
-                    type: $(e).data('type')
-                });
-            });
-            return dtColumns;
-        };
-
-        SOFTIT.getDtOrders = function (table) {
-            var dtOrders = new Array();
-            table.find('thead th').each(function (i, e) {
-                if ($(e).data('order') && dtOrders.length == 0) {
-                    dtOrders.push([i, $(e).data('order')]);
-                    return dtOrders;
-                }
-            });
-            return dtOrders;
-        };
     </script>
 }
 
